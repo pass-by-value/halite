@@ -230,10 +230,14 @@ Client side web application requirements:
 * Jasmine unit test framework (http://pivotal.github.io/jasmine/)
 
 Optional dependencies: 
+---------------------
 
 * Cherrypy web server (http://http://www.cherrypy.org/)
 * Paste web server (http://pythonpaste.org/)
 * Gevent web server(http://www.gevent.org/)
+
+.. code-block:: bash
+  $ pip install paste
 
 For nodejs testing:
 
