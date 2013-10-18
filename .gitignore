@@ -8,3 +8,5 @@ dist
 *.bbprojectd
 *.wpr
 *.wpu
+
+halite.egg-info/*
