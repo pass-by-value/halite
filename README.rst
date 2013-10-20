@@ -399,7 +399,7 @@ tested at once.
   $ karma start karma_e2e.conf.js
 
 
-You might have to build the distribution (for devs) 
+You might have to build the distribution (for development)
 
 .. code-block:: bash
 
