@@ -298,7 +298,8 @@ https://localhost:8080/app or however you have configured your master above.
 
 If you have problems look for "Halite:" in the saltstack master log output.
 
-2) Customized Deployment
+Customized Deployment
+====
 
 The Halite github repository provides a skeleton framework for building your own custom
 deployment. One can run the default bottle.py framwork form the command line thusly
