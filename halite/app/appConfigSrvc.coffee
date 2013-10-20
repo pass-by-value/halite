@@ -33,6 +33,13 @@ configuration =
                 url: "/app/project/"
                 template: "/static/app/view/project.html"
                 controller: "ProjectCtlr"
+            ,
+                label: "configuration"
+                route: "/app/configuration"
+                url: "/app/configuration/"
+                template: "/static/app/view/configuration.html"
+                controller: "ConfigurationCtlr"
+
             ]
     preferences:
         debug: false
