@@ -398,11 +398,14 @@ tested at once.
   $ cd halite
   $ karma start karma_e2e.conf.js
 
-.. ............................................................................
 
-.. _`halite`: https://github.com/saltstack/halite
+You might have to build the distribution (for devs) 
 
 .. code-block: bash
 
    $ cd halite
    $ ./prep_dist.py
+
+
+.. ............................................................................
+.. _`halite`: https://github.com/saltstack/halite
