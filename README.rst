@@ -401,7 +401,7 @@ tested at once.
 
 You might have to build the distribution (for devs) 
 
-.. code-block: bash
+.. code-block:: bash
 
    $ cd halite
    $ ./prep_dist.py
