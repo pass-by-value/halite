@@ -400,3 +400,8 @@ tested at once.
 .. ............................................................................
 
 .. _`halite`: https://github.com/saltstack/halite
+
+.. code-block: bash
+
+   $ cd halite
+   $ ./prep_dist.py
