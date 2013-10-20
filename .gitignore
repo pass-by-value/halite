@@ -8,5 +8,6 @@ dist
 *.bbprojectd
 *.wpr
 *.wpu
+*.js
 
 halite.egg-info/*
