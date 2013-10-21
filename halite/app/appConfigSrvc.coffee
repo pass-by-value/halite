@@ -38,7 +38,7 @@ configuration =
                 route: "/app/configuration"
                 url: "/app/configuration/"
                 template: "/static/app/view/configuration.html"
-                controller: "ConfigurationCtlr"
+                controller: "ConfigurationCtrl"
 
             ]
     preferences:
