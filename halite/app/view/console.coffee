@@ -328,6 +328,7 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
                 cmds = $scope.command.getCmds()
             command = $scope.snagCommand($scope.humanize(cmds), cmds)
             
+            console.log('Calling SaltApiSrvc.action')
             SaltApiSrvc.action($scope, cmds )
             .success (data, status, headers, config ) ->
                 results = data.return

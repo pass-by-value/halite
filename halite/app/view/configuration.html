@@ -2,4 +2,7 @@
 <ul ng-controller="ConfigurationCtrl">
   <li ng-repeat="name in names">{{name}}</li>
 </ul>
-
+<div ng-controller="ConfigurationCtrl">
+        <span>Hello {{docs}}</span>
+        <input ng-disabled="!isSearchable()" />
+</div>
