@@ -1,9 +1,13 @@
 mainApp = angular.module("MainApp")
 
 mainApp.controller 'ConfigurationCtrl', [
-    '$scope', '$location', '$route','Configuration', 'SaltApiSrvc',
-        ($scope, $location, $route, Configuration, SaltApiSrvc) ->
+    '$scope', '$location', '$route','$q', 'Configuration', 'SaltApiSrvc', 'Jobber', 'AppData', 'Itemizer',
+        ($scope, $location, $route, $q, Configuration, SaltApiSrvc, Jobber, AppData, Itemizer) ->
             $scope.errorMsg = ""
+
+            if !AppData.get('jobs')?
+                AppData.set('jobs', new Itemizer())
+            $scope.jobs = AppData.get('jobs')
 
             $scope.names = ['Foo', 'Bar', 'Spam']
             command =
@@ -36,8 +40,14 @@ mainApp.controller 'ConfigurationCtrl', [
                 job.initResults(result.minions)
                 return job
 
-            
+            $scope.snagJob = (jid, cmd) -> #get or create a Jobber 
+                if not $scope.jobs.get(jid)?
+                    job = new Jobber(jid, cmd)
+                    $scope.jobs.set(jid, job)
+                return ($scope.jobs.get(jid))
+
             console.log SaltApiSrvc
+
             SaltApiSrvc.run($scope, commands)
             .success (data, status, headers, config) ->
                    console.log('Hello World')
