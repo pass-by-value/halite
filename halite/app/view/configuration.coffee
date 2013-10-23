@@ -18,7 +18,7 @@ mainApp.controller 'ConfigurationCtrl', [
                 expr_form: 'glob'
 
             commands = [command]
- 
+
             $scope.docs_loaded = false
 
             $scope.isSearchable = () ->
@@ -40,7 +40,7 @@ mainApp.controller 'ConfigurationCtrl', [
                 job.initResults(result.minions)
                 return job
 
-            $scope.snagJob = (jid, cmd) -> #get or create a Jobber 
+            $scope.snagJob = (jid, cmd) -> #get or create a Jobber
                 if not $scope.jobs.get(jid)?
                     job = new Jobber(jid, cmd)
                     $scope.jobs.set(jid, job)
@@ -48,19 +48,27 @@ mainApp.controller 'ConfigurationCtrl', [
 
             console.log SaltApiSrvc
 
-            SaltApiSrvc.run($scope, commands)
-            .success (data, status, headers, config) ->
-                   console.log('Hello World')
-                   console.log(data)
-                   $scope.docs_loaded = true
-                   result = data.return?[0] #result is a tag
-                   if result
+            $scope.job_done = (donejob) ->
+                console.log('Job is Done')
+            $scope.job_fail = () ->
+                console.log('Job has Failed')
 
-                       job = $scope.startJob(result, commands) #runner result is a tag
-                       job.commit($q).then (donejob) ->
-                           console.log 'Done Job is'
-                           console.log donejob
-                   return true
-            .error (data, status, headers, config) ->
-                   return false
+            $scope.fetchDocs = () ->
+                SaltApiSrvc.run($scope, commands)
+                .success (data, status, headers, config) ->
+                       console.log('Hello World')
+                       console.log(data)
+                       $scope.docs_loaded = true
+                       result = data.return?[0] #result is a tag
+                       if result
+
+                           job = $scope.startJob(result, commands) #runner result is a tag
+                           console.log "Job is"
+                           console.log job
+                           job.commit($q).then($scope.job_done, $scope.job_fail)
+                           return true
+                .error (data, status, headers, config) ->
+                       console.log('In error')
+                       return false
+                return true
 ]
