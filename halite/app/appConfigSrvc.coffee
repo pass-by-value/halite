@@ -34,11 +34,11 @@ configuration =
                 template: "/static/app/view/project.html"
                 controller: "ProjectCtlr"
             ,
-                label: "configuration"
-                route: "/app/configuration"
-                url: "/app/configuration/"
-                template: "/static/app/view/configuration.html"
-                controller: "ConfigurationCtrl"
+                label: "docs"
+                route: "/app/docs"
+                url: "/app/docs/"
+                template: "/static/app/view/docs.html"
+                controller: "DocsCtrl"
 
             ]
     preferences:

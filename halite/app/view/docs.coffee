@@ -1,6 +1,6 @@
 mainApp = angular.module("MainApp")
 
-mainApp.controller 'ConfigurationCtrl', [
+mainApp.controller 'DocsCtrl', [
     '$scope', '$location', '$route','$q', 'Configuration', 'SaltApiEvtSrvc',
     'SaltApiSrvc', 'SessionStore', 'Jobber', 'Runner', 'Commander', 'Minioner',
     'AppData', 'Itemizer',
@@ -37,10 +37,15 @@ mainApp.controller 'ConfigurationCtrl', [
 
             $scope.docs_loaded = false
 
+            $scope.searchDocs = () ->
+                matching = _.filter($scope.keys, (key) ->
+                    return key.indexOf($scope.search_str.toLowerCase()) != -1) 
+                matching_docs = ($scope.docs[key] for key in matching)
+                console.log(matching_docs)
+                return matching_docs
+
             $scope.isSearchable = () ->
                return $scope.docs_loaded
-
-            $scope.docs = 'Foo'
 
             $scope.humanize = (cmds) ->
                 unless angular.isArray(cmds)
@@ -83,7 +88,7 @@ mainApp.controller 'ConfigurationCtrl', [
                 if minion_with_result?
                     $scope.docs = minion_with_result.val.return
                     $scope.keys = for key, value of $scope.docs
-                        "#{key}"
+                        "#{key.toLowerCase()}"
                 else
                     $scope.errorMsg = 'All Minions Returned Invalid Data. Please check Minions and retry.'
                 return
@@ -227,5 +232,7 @@ mainApp.controller 'ConfigurationCtrl', [
             if not SaltApiEvtSrvc.active and SessionStore.get('loggedIn') == true
                 $scope.openEventStream()
 
-]
+            $scope.fetchDocs()
+
+    ]
 
