@@ -2,9 +2,11 @@ mainApp = angular.module("MainApp")
 
 mainApp.controller 'ConfigurationCtrl', [
     '$scope', '$location', '$route','$q', 'Configuration', 'SaltApiEvtSrvc',
-    'SaltApiSrvc', 'SessionStore', 'Jobber', 'Runner', 'AppData', 'Itemizer',
+    'SaltApiSrvc', 'SessionStore', 'Jobber', 'Runner', 'Commander', 'Minioner',
+    'AppData', 'Itemizer',
         ($scope, $location, $route, $q, Configuration, SaltApiEvtSrvc,
-        SaltApiSrvc, SessionStore, Jobber, Runner, AppData, Itemizer) ->
+        SaltApiSrvc, SessionStore, Jobber, Runner, Commander,
+        Minioner, AppData, Itemizer) ->
             $scope.errorMsg = ""
 
             if !AppData.get('jobs')?
@@ -14,6 +16,14 @@ mainApp.controller 'ConfigurationCtrl', [
             if !AppData.get('events')?
                 AppData.set('events', new Itemizer())
             $scope.events = AppData.get('events')
+
+            if !AppData.get('commands')?
+                AppData.set('commands', new Itemizer())
+            $scope.commands = AppData.get('commands')
+
+            if !AppData.get('minions')?
+                AppData.set('minions', new Itemizer())
+            $scope.minions = AppData.get('minions')
 
             $scope.names = ['Foo', 'Bar', 'Spam']
             command =
@@ -69,12 +79,19 @@ mainApp.controller 'ConfigurationCtrl', [
 
             console.log SaltApiSrvc
 
-            $scope.job_done = (donejob) ->
+            $scope.job_done = (donejob, a, b) ->
                 console.log('Job is Done')
+                console.log(donejob)
+                console.log(a)
+                console.log(b)
+                console.log(donejob.results)
+                console.log('***************')
             $scope.job_fail = () ->
                 console.log('Job has Failed')
 
             $scope.fetchDocs = () ->
+                command = $scope.snagCommand($scope.humanize(commands), commands)
+
                 SaltApiSrvc.run($scope, commands)
                 .success (data, status, headers, config) ->
                        console.log('Hello World')
@@ -93,8 +110,30 @@ mainApp.controller 'ConfigurationCtrl', [
                        return false
                 return true
 
+            $scope.snagMinion = (mid) -> # get or create Minion
+                if not $scope.minions.get(mid)?
+                    $scope.minions.set(mid, new Minioner(mid))
+                return ($scope.minions.get(mid))
+
+            $scope.processJobEvent = (jid, kind, edata) ->
+                console.log "Process Job Event: "
+                job = $scope.jobs.get(jid)
+                job.processEvent(edata)
+                data = edata.data
+                if kind == 'new'
+                    console.log "Process Job Event with kind new"
+                    job.processNewEvent(data)
+                else if kind == 'ret'
+                    console.log 'Process Job event with kind ret'
+                    minion = $scope.snagMinion(data.id)
+                    minion.activize() #since we got a return then minion must be active
+                    job.linkMinion(minion)
+                    job.processRetEvent(data)
+                    job.checkDone()
+                return job
+
             $scope.processSaltEvent = (edata) ->
-                #console.log "Process Salt Event: "
+                console.log "Process Salt Event: "
                 #console.log edata
                 if not edata.data._stamp?
                     edata.data._stamp = $scope.stamp()
@@ -102,6 +141,7 @@ mainApp.controller 'ConfigurationCtrl', [
                 $scope.events.set(edata.utag, edata)
                 parts = edata.tag.split("/") # split on "/" character
                 if parts[0] is 'salt'
+                    console.log('In the if for processSaltEvent')
                     if parts[1] is 'job'
                         jid = parts[2]
                         if jid != edata.data.jid
@@ -110,6 +150,7 @@ mainApp.controller 'ConfigurationCtrl', [
                             return false
                         $scope.snagJob(jid, edata.data)
                         kind = parts[3]
+                        console.log "Process Job event Being Called"
                         $scope.processJobEvent(jid, kind, edata)
 
                     else if parts[1] is 'run'
@@ -120,6 +161,7 @@ mainApp.controller 'ConfigurationCtrl', [
                             return false
                         $scope.snagRunner(jid, edata.data)
                         kind = parts[3]
+                        console.log "Process Run event Being Called"
                         $scope.processRunEvent(jid, kind, edata)
 
                     else if parts[1] is 'wheel'
@@ -130,6 +172,7 @@ mainApp.controller 'ConfigurationCtrl', [
                             return false
                         $scope.snagWheel(jid, edata.data)
                         kind = parts[3]
+                        console.log "Process Wheel event Being Called"
                         $scope.processWheelEvent(jid, kind, edata)
 
                     else if parts[1] is 'minion' or parts[1] is 'syndic'
@@ -138,11 +181,15 @@ mainApp.controller 'ConfigurationCtrl', [
                             console.log "Bad minion event"
                             $scope.errorMsg = "Bad minion event: MID #{mid} not match #{edata.data.id}"
                             return false
+                        console.log "Process Minion event Being Called"
                         $scope.processMinionEvent(mid, edata)
 
-                     else if parts[1] is 'key'
+                    else if parts[1] is 'key'
+                        console.log "Process Key event Being Called"
                         $scope.processKeyEvent(edata)
 
+                console.log('Returning edata')
+                console.log edata
                 return edata
 
             $scope.openEventStream = () ->
@@ -166,6 +213,11 @@ mainApp.controller 'ConfigurationCtrl', [
                 #console.log "Closing Event Stream"
                 SaltApiEvtSrvc.close()
                 return true
+
+            $scope.snagCommand = (name, cmds) -> #get or create Command
+                unless $scope.commands.get(name)?
+                    $scope.commands.set(name, new Commander(name, cmds))
+                return ($scope.commands.get(name))
 
             $scope.clearSaltData = () ->
                 AppData.set('commands', new Itemizer())

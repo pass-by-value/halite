@@ -6,3 +6,75 @@
         <span>Hello {{docs}}</span>
         <input ng-disabled="!isSearchable()" />
 </div>
+<div class="box box-no-border" ng-repeat="job in jobs.values() | orderBy:sortJobs:jobReverse | pagerize:jobPager">
+    <div ng-repeat="result in job.results.values()">
+        {{result.id}}, {{result.retcode}}
+    </div>
+</div>
+<script type="text/ng-template" id="ensual_nested.html">
+  <span ng-switch on="expandMode(ensual)">
+    <span ng-switch-when="lone" >
+      <n>{{ensual}}</n>
+    </span>
+    <span ng-switch-when="vect" >[
+      <span ng-repeat="value in ensual track by $index">
+        <n>{{value}}{{!$last ? " ," : ""}}</n>
+      </span>]
+    </span>
+    <span ng-switch-when="list"> 
+      <i class="btn btn-default btn-sm slack" 
+        ng-class="expanded.value?'fa-icon-caret-down':'fa-icon-caret-right'"
+        ng-init="expanded={'value': false}" ng-click="expanded.value = !expanded.value">
+      </i>
+      <kvl class="indent tight" ng-if="expanded.value">[
+        <kvi ng-repeat="ensual in ensual track by $index">
+          <span ng-include="'ensual_nested_list.html'"></span>{{!$last?",":""}}
+        </kvi>
+        ]
+      </kvl>
+    </span>
+    <span ng-switch-when="dict" >
+      <i class="btn btn-default btn-sm slack" 
+        ng-class="expanded.value?'fa-icon-caret-down':'fa-icon-caret-right'"
+        ng-init="expanded={'value': false}" ng-click="expanded.value = !expanded.value">
+      </i>
+      <kvl class="indent" ng-if="expanded.value">
+        <kvi ng-repeat="(key, ensual) in ensual track by $index">
+          <b><i>{{key}}: </i></b>
+          <span ng-include="'ensual_nested.html'"></span>
+        </kvi>
+      </kvl>
+    </span>
+    <span ng-switch-default>Whoops</span>
+  </span>
+</script>
+
+<script type="text/ng-template" id="ensual_nested_list.html">
+  <span ng-switch on="expandMode(ensual)">
+    <span ng-switch-when="lone" >
+      <n>{{ensual}}</n>
+    </span>
+    <span ng-switch-when="vect">[
+      <span ng-repeat="value in ensual track by $index">
+        <n>{{value}}{{!$last ? " ," : ""}}</n>
+      </span>]
+    </span>
+    <span ng-switch-when="list">
+      <kvl class="indent tight" ng-if="expanded.value">[
+        <kvi ng-repeat="ensual in ensual track by $index">
+          <span ng-include="'ensual_nested_list.html'"></span>{{!$last?",":""}}
+        </kvi>
+        ]
+      </kvl>
+    </span>
+    <span ng-switch-when="dict">
+      <kvl class="indent tight" ng-if="expanded.value">
+        <kvi ng-repeat="(key, ensual) in ensual track by $index">
+          <b><i>{{key}}: </i></b>
+          <span ng-include="'ensual_nested.html'"></span>
+        </kvi>
+      </kvl>
+    </span>
+    <span ng-switch-default>Whoops</span>
+  </span>
+</script>
