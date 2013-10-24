@@ -1,3 +1,14 @@
-<div>
-    <input ng-disabled="!isSearchable()" ng-model="search_str" ng-change="searchDocs()"/>
+<div class="row">
+    <div class="col-md-12">
+        <ss-alert type="'danger'" close="closeAlert()" ng-cloak
+            ng-show="!!$parent.errorMsg">Error! {{errorMsg}}
+        </ss-alert>
+    </div>
 </div>
+<div class="row">
+    <div class="col-md-12">
+        <input ng-disabled="!isSearchable()" ng-model="search_str" ng-change="searchDocs()"/>
+        <pre>{{to_render}}</pre>
+    </div>
+</div>
+

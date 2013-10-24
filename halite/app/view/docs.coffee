@@ -41,8 +41,8 @@ mainApp.controller 'DocsCtrl', [
                 matching = _.filter($scope.keys, (key) ->
                     return key.indexOf($scope.search_str.toLowerCase()) != -1) 
                 matching_docs = ($scope.docs[key] for key in matching)
-                console.log(matching_docs)
-                return matching_docs
+                $scope.to_render = matching_docs.join('')
+                return true
 
             $scope.isSearchable = () ->
                return $scope.docs_loaded
@@ -89,6 +89,7 @@ mainApp.controller 'DocsCtrl', [
                     $scope.docs = minion_with_result.val.return
                     $scope.keys = for key, value of $scope.docs
                         "#{key.toLowerCase()}"
+                    $scope.docs_loaded = true
                 else
                     $scope.errorMsg = 'All Minions Returned Invalid Data. Please check Minions and retry.'
                 return
@@ -97,11 +98,14 @@ mainApp.controller 'DocsCtrl', [
                 $scope.errorMsg = 'Job Failed. Please check system and retry.'
 
             $scope.fetchDocs = () ->
+                if SessionStore.get('loggedIn')? == false
+                    $scope.errorMsg = 'Please Log In'
+                    return false
+
                 command = $scope.snagCommand($scope.humanize(commands), commands)
 
                 SaltApiSrvc.run($scope, commands)
                 .success (data, status, headers, config) ->
-                       $scope.docs_loaded = true
                        result = data.return?[0] #result is a tag
                        if result
 
