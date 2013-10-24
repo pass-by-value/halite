@@ -63,12 +63,12 @@ mainApp.controller 'ConfigurationCtrl', [
                 return ($scope.jobs.get(jid))
 
             $scope.startJob = (result, cmd) ->
-                console.log "Start Job #{$scope.humanize(cmd)}"
-                console.log result
+                #console.log "Start Job #{$scope.humanize(cmd)}"
+                #console.log result
                 jid = result.jid
                 job = $scope.snagJob(jid, cmd)
                 job.initResults(result.minions)
-                console.log job
+                #console.log job
                 return job
 
             $scope.snagJob = (jid, cmd) -> #get or create a Jobber
@@ -77,36 +77,46 @@ mainApp.controller 'ConfigurationCtrl', [
                     $scope.jobs.set(jid, job)
                 return ($scope.jobs.get(jid))
 
-            console.log SaltApiSrvc
+            #console.log SaltApiSrvc
 
             $scope.job_done = (donejob, a, b) ->
-                console.log('Job is Done')
-                console.log(donejob)
-                console.log(a)
-                console.log(b)
-                console.log(donejob.results)
-                console.log('***************')
+                #console.log('Job is Done')
+                #console.log(donejob)
+                #console.log(a)
+                #console.log(b)
+                #console.log(donejob.results)
+                results = donejob.results
+                minions = results._data
+                #console.log(minions)
+                minion_with_result = _.find(minions, (minion) ->
+                    minion.val.retcode == 0)
+                if minion_with_result?
+                    $scope.docs = minion_with_result.val.return
+                    $scope.docs_loaded = true
+                else
+                    $scope.errorMsg = 'All Minions Returned Invalid Data. Please check Minions and retry.'
+                return
+
             $scope.job_fail = () ->
-                console.log('Job has Failed')
+                $scope.errorMsg = 'Job Failed. Please check system and retry.'
 
             $scope.fetchDocs = () ->
                 command = $scope.snagCommand($scope.humanize(commands), commands)
 
                 SaltApiSrvc.run($scope, commands)
                 .success (data, status, headers, config) ->
-                       console.log('Hello World')
-                       console.log(data)
-                       $scope.docs_loaded = true
+                       #console.log('Hello World')
+                       #console.log(data)
                        result = data.return?[0] #result is a tag
                        if result
 
                            job = $scope.startJob(result, commands) #runner result is a tag
-                           console.log "Job is"
-                           console.log job
+                           #console.log "Job is"
+                           #console.log job
                            job.commit($q).then($scope.job_done, $scope.job_fail)
                            return true
                 .error (data, status, headers, config) ->
-                       console.log('In error')
+                       #console.log('In error')
                        return false
                 return true
 
@@ -116,15 +126,15 @@ mainApp.controller 'ConfigurationCtrl', [
                 return ($scope.minions.get(mid))
 
             $scope.processJobEvent = (jid, kind, edata) ->
-                console.log "Process Job Event: "
+                #console.log "Process Job Event: "
                 job = $scope.jobs.get(jid)
                 job.processEvent(edata)
                 data = edata.data
                 if kind == 'new'
-                    console.log "Process Job Event with kind new"
+                    #console.log "Process Job Event with kind new"
                     job.processNewEvent(data)
                 else if kind == 'ret'
-                    console.log 'Process Job event with kind ret'
+                    #console.log 'Process Job event with kind ret'
                     minion = $scope.snagMinion(data.id)
                     minion.activize() #since we got a return then minion must be active
                     job.linkMinion(minion)
@@ -133,7 +143,7 @@ mainApp.controller 'ConfigurationCtrl', [
                 return job
 
             $scope.processSaltEvent = (edata) ->
-                console.log "Process Salt Event: "
+                #console.log "Process Salt Event: "
                 #console.log edata
                 if not edata.data._stamp?
                     edata.data._stamp = $scope.stamp()
@@ -141,55 +151,55 @@ mainApp.controller 'ConfigurationCtrl', [
                 $scope.events.set(edata.utag, edata)
                 parts = edata.tag.split("/") # split on "/" character
                 if parts[0] is 'salt'
-                    console.log('In the if for processSaltEvent')
+                    #console.log('In the if for processSaltEvent')
                     if parts[1] is 'job'
                         jid = parts[2]
                         if jid != edata.data.jid
-                            console.log "Bad job event"
+                            #console.log "Bad job event"
                             $scope.errorMsg = "Bad job event: JID #{jid} not match #{edata.data.jid}"
                             return false
                         $scope.snagJob(jid, edata.data)
                         kind = parts[3]
-                        console.log "Process Job event Being Called"
+                        #console.log "Process Job event Being Called"
                         $scope.processJobEvent(jid, kind, edata)
 
                     else if parts[1] is 'run'
                         jid = parts[2]
                         if jid != edata.data.jid
-                            console.log "Bad run event"
+                            #console.log "Bad run event"
                             $scope.errorMsg = "Bad run event: JID #{jid} not match #{edata.data.jid}"
                             return false
                         $scope.snagRunner(jid, edata.data)
                         kind = parts[3]
-                        console.log "Process Run event Being Called"
+                        #console.log "Process Run event Being Called"
                         $scope.processRunEvent(jid, kind, edata)
 
                     else if parts[1] is 'wheel'
                         jid = parts[2]
                         if jid != edata.data.jid
-                            console.log "Bad wheel event"
+                            #console.log "Bad wheel event"
                             $scope.errorMsg = "Bad wheel event: JID #{jid} not match #{edata.data.jid}"
                             return false
                         $scope.snagWheel(jid, edata.data)
                         kind = parts[3]
-                        console.log "Process Wheel event Being Called"
+                        #console.log "Process Wheel event Being Called"
                         $scope.processWheelEvent(jid, kind, edata)
 
                     else if parts[1] is 'minion' or parts[1] is 'syndic'
                         mid = parts[2]
                         if mid != edata.data.id
-                            console.log "Bad minion event"
+                            #console.log "Bad minion event"
                             $scope.errorMsg = "Bad minion event: MID #{mid} not match #{edata.data.id}"
                             return false
-                        console.log "Process Minion event Being Called"
+                        #console.log "Process Minion event Being Called"
                         $scope.processMinionEvent(mid, edata)
 
                     else if parts[1] is 'key'
-                        console.log "Process Key event Being Called"
+                        #console.log "Process Key event Being Called"
                         $scope.processKeyEvent(edata)
 
-                console.log('Returning edata')
-                console.log edata
+                #console.log('Returning edata')
+                #console.log edata
                 return edata
 
             $scope.openEventStream = () ->
@@ -200,7 +210,7 @@ mainApp.controller 'ConfigurationCtrl', [
                     $scope.$emit('Activate')
                     $scope.eventing = false
                 , (data) ->
-                    console.log "Error Opening Event Stream"
+                    #console.log "Error Opening Event Stream"
                     if SessionStore.get('loggedIn') == false
                         $scope.errorMsg = "Cannot open event stream! Must login first!"
                     else
