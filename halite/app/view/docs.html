@@ -7,7 +7,9 @@
 </div>
 <div class="row">
     <div class="col-md-12">
-        <input ng-disabled="!isSearchable()" ng-model="search_str" ng-change="searchDocs()"/>
+        <label>Search: </label>
+        <input ng-disabled="!isSearchable()" ng-model="search_str" ng-change="searchDocs()" placeholder="Enter Search String" />
+        <hr />
         <pre>{{to_render}}</pre>
     </div>
 </div>

@@ -222,6 +222,16 @@ mainApp.controller 'DocsCtrl', [
                 AppData.set('events', new Itemizer())
                 $scope.events = AppData.get('events')
 
+            $scope.processKeyEvent = (edata) ->
+                data = edata.data
+                mid = data.id
+                minion = $scope.snagMinion(mid)
+                if data.result is true
+                    if data.act is 'delete'
+                        minion.unlinkJobs()
+                        $scope.minions.del(mid)
+                    return minion
+
             $scope.authListener = (event, loggedIn) ->
                 if loggedIn
                     $scope.openEventStream()
