@@ -25,7 +25,6 @@ mainApp.controller 'DocsCtrl', [
                 AppData.set('minions', new Itemizer())
             $scope.minions = AppData.get('minions')
 
-            $scope.names = ['Foo', 'Bar', 'Spam']
             command =
                 fun: 'sys.doc'
                 mode: 'async'
@@ -39,7 +38,7 @@ mainApp.controller 'DocsCtrl', [
 
             $scope.searchDocs = () ->
                 matching = _.filter($scope.keys, (key) ->
-                    return key.indexOf($scope.search_str.toLowerCase()) != -1) 
+                    return key.indexOf($scope.search_str.toLowerCase()) != -1)
                 matching_docs = ($scope.docs[key] for key in matching)
                 $scope.to_render = matching_docs.join('')
                 return true
