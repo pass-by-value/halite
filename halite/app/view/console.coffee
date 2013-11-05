@@ -378,11 +378,21 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
 
           SaltApiSrvc.run($scope, cmd)
           .success (data, status, headers, config) ->
-              console.log data
+              wheel = $scope.startWheel(data.return?[0], cmd)
+              wheel.commit($q).then (donejob) ->
+                currentlyActiveMinions = donejob.results.get('master').return.minions
+                allMinions = $scope.minions.keys()
+                toDeactivate = _.difference(allMinions, currentlyActiveMinions)
+                for mid in toDeactivate
+                  minion = $scope.snagMinion(mid)
+                  console.log "deactivate #{mid}"
+                  minion.deactivize()
+                $scope.minions = donejob.minions
+                return true
               return true
-          .error (data, status, heades, config) ->
+          .error (data, status, headers, config) ->
               console.log "error"
-              console.log data;
+              console.log data
               return true
           return true
 
