@@ -370,7 +370,22 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
                 $scope.pinging = false
                 
             return true
-        
+
+        $scope.getAllListedMinions = () ->
+          cmd =
+            mode: "async"
+            fun: "wheel.key.list_all"
+
+          SaltApiSrvc.run($scope, cmd)
+          .success (data, status, headers, config) ->
+              console.log data
+              return true
+          .error (data, status, heades, config) ->
+              console.log "error"
+              console.log data;
+              return true
+          return true
+
         $scope.fetchActives = () ->
             cmd =
                 mode: "async"
