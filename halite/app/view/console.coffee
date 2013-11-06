@@ -351,7 +351,7 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
             .error (data, status, headers, config) ->
                 $scope.commanding = false
                 
-        $scope.fetchPings = (target) ->
+        $scope.fetchPingsAndGrains = (target) ->
             target = if target then target else "*"
             cmd =
                 mode: "async"
@@ -364,6 +364,14 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
                 result = data.return?[0]
                 if result
                     job = $scope.startJob(result, cmd)
+                    job.commit($q)
+                    .then (donejob) ->
+                        for {key: mid, val: result} in donejob.results.items()
+                          if not result.fail and result.active
+                            minion = $scope.snagMinion(mid)
+                            minion.activize()
+                            $scope.fetchGrains(mid)
+                        return true
                 $scope.pinging = false
                 return true
             .error (data, status, headers, config) ->
@@ -404,10 +412,7 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
                 for {key: _key, val: result} in donejob.results.items()
                   unless result.fail
                     for mid in result.return.minions
-                      # TODO: Do start these until we have succesful pings from this
-                      # Fetch grains for the ones who returned success to ping
-                      minion = $scope.snagMinion(mid)
-                      minion.activize()
+                      $scope.fetchPingsAndGrains(mid)
                 return true
               , (error) ->
                   console.log "There was some error"
@@ -417,30 +422,6 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
               console.log data
               return true
           return true
-
-        $scope.fetchActives2 = () ->
-            cmd =
-                mode: "async"
-                fun: "runner.manage.status"
-
-            $scope.statusing = true
-            SaltApiSrvc.run($scope, [cmd])
-            .success (data, status, headers, config) ->
-                #$scope.statusing = false
-                result = data.return?[0] #result is tag
-                if result
-
-                    job = $scope.startRun(result, cmd) #runner result is tag
-                    job.commit($q).then (donejob) ->
-                        console.log "fetchActives donejob"
-                        console.log donejob
-                        $scope.assignActives(donejob)
-                        $scope.$emit("Marshall")
-
-                return true
-            .error (data, status, headers, config) ->
-                $scope.statusing = false
-            return true
 
         $scope.assignActives = (job) ->
             for {key: mid, val: result} in job.results.items()
