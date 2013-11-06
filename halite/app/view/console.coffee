@@ -422,27 +422,6 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
               return true
           return true
 
-        $scope.assignActives = (job) ->
-            for {key: mid, val: result} in job.results.items()
-                unless result.fail
-                    status = result.return
-                    mids = []
-                    for mid in status.up
-                        minion = $scope.snagMinion(mid)
-                        minion.activize()
-                        mids.push mid
-                    for mid in status.down
-                        minion = $scope.snagMinion(mid)
-                        minion.deactivize()
-                        mids.push mid
-                    for key in $scope.minions.keys()
-                        unless key in mids
-                            minion = $scope.snagMinion(key)
-                            minion.unlinkJobs()
-                    $scope.minions?.filter(mids) #remove non status minions
-            $scope.statusing = false
-            return job
-            
         $scope.fetchGrains = (target) ->
             #target = if target then target else "*"
             cmd =
@@ -731,7 +710,8 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
         $scope.marshallListener = (event) ->
             #console.log "Received #{event.name}"
             #console.log event
-            $scope.fetchGrains()
+            $scope.fetchActives()
+            $scope.fetchDocs()
 
         $scope.$on('ToggleAuth', $scope.authListener)
         $scope.$on('Activate', $scope.activateListener)
