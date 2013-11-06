@@ -407,7 +407,6 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
 
               wheel.commit($q)
               .then (donejob) ->
-                # TODO: Figure out why this code block isn't getting called at times
                 $scope.deactivateMinions(donejob)
                 for {key: _key, val: result} in donejob.results.items()
                   unless result.fail
