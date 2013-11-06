@@ -371,7 +371,24 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
                 
             return true
 
-        $scope.getAllListedMinions = () ->
+        $scope.deactivateMinions = (donejob) ->
+          currentlyActiveMinions = for {key: _key, val: result} in donejob.results.items()
+                                    "#{_key}"
+          minionInfo = donejob.results.items()[0].val.results()[0]
+          if not donejob.results.items()[0].val.fail
+            currentlyActiveMinions = for minion in donejob.results.items()[0].val.results()[0].minions
+                                      "#{minion}"
+          else
+            currentlyActiveMinions = []
+          allMinions = $scope.minions.keys()
+          # TODO: Figure out what to do with minions_pre and minions_rejected and if they need to be included below
+          toDeactivate = _.difference(allMinions, currentlyActiveMinions)
+          for mid in toDeactivate
+            minion = $scope.snagMinion(mid)
+            minion.deactivize()
+            $scope.minions.del(mid)
+
+        $scope.fetchActives = () ->
           cmd =
             mode: "async"
             fun: "wheel.key.list_all"
@@ -382,20 +399,15 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
 
               wheel.commit($q)
               .then (donejob) ->
-                # TODO: Figure out why this does not get called at times
-                currentlyActiveMinions = donejob.results.get('master').return.minions
-                allMinions = $scope.minions.keys()
-                # TODO: Figure out what to do with minions_pre and minions_rejected and if they need to be included below
-                toDeactivate = _.difference(allMinions, currentlyActiveMinions)
-                for mid in toDeactivate
-                  minion = $scope.snagMinion(mid)
-                  console.log "deactivate #{mid}"
-                  minion.deactivize()
+                # TODO: Figure out why this code block isn't getting called at times
+                $scope.deactivateMinions(donejob)
                 for {key: _key, val: result} in donejob.results.items()
                   unless result.fail
                     for mid in result.return.minions
-                      console.log mid
-                      # TODO: Refresh $scope.minions
+                      # TODO: Do start these until we have succesful pings from this
+                      # Fetch grains for the ones who returned success to ping
+                      minion = $scope.snagMinion(mid)
+                      minion.activize()
                 return true
               , (error) ->
                   console.log "There was some error"
@@ -406,35 +418,32 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
               return true
           return true
 
-        $scope.fetchActives = () ->
+        $scope.fetchActives2 = () ->
             cmd =
                 mode: "async"
                 fun: "runner.manage.status"
 
-            $scope.statusing = true   
+            $scope.statusing = true
             SaltApiSrvc.run($scope, [cmd])
             .success (data, status, headers, config) ->
                 #$scope.statusing = false
                 result = data.return?[0] #result is tag
                 if result
-                    
+
                     job = $scope.startRun(result, cmd) #runner result is tag
                     job.commit($q).then (donejob) ->
                         console.log "fetchActives donejob"
                         console.log donejob
                         $scope.assignActives(donejob)
                         $scope.$emit("Marshall")
-                    
+
                 return true
             .error (data, status, headers, config) ->
-                $scope.statusing = false        
+                $scope.statusing = false
             return true
-        
+
         $scope.assignActives = (job) ->
-            console.log "assignactives"
             for {key: mid, val: result} in job.results.items()
-                console.log mid
-                console.log result
                 unless result.fail
                     status = result.return
                     mids = []
