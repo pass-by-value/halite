@@ -379,16 +379,26 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
           SaltApiSrvc.run($scope, cmd)
           .success (data, status, headers, config) ->
               wheel = $scope.startWheel(data.return?[0], cmd)
-              wheel.commit($q).then (donejob) ->
+
+              wheel.commit($q)
+              .then (donejob) ->
+                # TODO: Figure out why this does not get called at times
                 currentlyActiveMinions = donejob.results.get('master').return.minions
                 allMinions = $scope.minions.keys()
+                # TODO: Figure out what to do with minions_pre and minions_rejected and if they need to be included below
                 toDeactivate = _.difference(allMinions, currentlyActiveMinions)
                 for mid in toDeactivate
                   minion = $scope.snagMinion(mid)
                   console.log "deactivate #{mid}"
                   minion.deactivize()
-                $scope.minions = donejob.minions
+                for {key: _key, val: result} in donejob.results.items()
+                  unless result.fail
+                    for mid in result.return.minions
+                      console.log mid
+                      # TODO: Refresh $scope.minions
                 return true
+              , (error) ->
+                  console.log "There was some error"
               return true
           .error (data, status, headers, config) ->
               console.log "error"
@@ -410,6 +420,8 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
                     
                     job = $scope.startRun(result, cmd) #runner result is tag
                     job.commit($q).then (donejob) ->
+                        console.log "fetchActives donejob"
+                        console.log donejob
                         $scope.assignActives(donejob)
                         $scope.$emit("Marshall")
                     
@@ -419,7 +431,10 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
             return true
         
         $scope.assignActives = (job) ->
+            console.log "assignactives"
             for {key: mid, val: result} in job.results.items()
+                console.log mid
+                console.log result
                 unless result.fail
                     status = result.return
                     mids = []
