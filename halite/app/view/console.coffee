@@ -377,8 +377,8 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
           toDeactivate = _.difference($scope.minions.keys(), mids)
           for mid in toDeactivate
             minion = $scope.snagMinion(mid)
-            minion.deactivize()
-            $scope.minions.del(mid)
+            minion.unlinkJobs()
+          $scope.minions?.filter toDeactivate
           return mids
 
         $scope.getWheelTag = ($q, $rootScope) ->
