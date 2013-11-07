@@ -389,7 +389,7 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
           .success (data, status, headers, config) ->
             defer.resolve data.return?[0]
           .error (reason) ->
-              defer.reject reason
+            defer.reject reason
           return defer.promise
 
         $scope.getMinionListFromWheeler = (tag) ->
@@ -513,8 +513,8 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
 
 
         $scope.startWheel = (tag, cmd) ->
-            console.log "Start Wheel #{$scope.humanize(cmd)}"
-            console.log tag
+#            console.log "Start Wheel #{$scope.humanize(cmd)}"
+#            console.log tag
             parts = tag.split("/")
             jid = parts[2]
             job = $scope.snagWheel(jid, cmd)
@@ -699,13 +699,17 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
         $scope.activateListener = (event) ->
             #console.log "Received #{event.name}"
             #console.log event
-            $scope.fetchActives()
-            $scope.fetchDocs()
+            $scope.$emit "Marshall"
+
 
         $scope.marshallListener = (event, mid) ->
 #            console.log "Received #{event.name}"
 #            console.log event
-            $scope.fetchGrains(mid)
+            if mid?
+              $scope.fetchGrains(mid)
+            else
+              $scope.fetchActives()
+              $scope.fetchDocs()
 
         $scope.$on('ToggleAuth', $scope.authListener)
         $scope.$on('Activate', $scope.activateListener)
