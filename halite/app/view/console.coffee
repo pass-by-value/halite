@@ -416,9 +416,12 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
               .then((mid) ->
                 minion = $scope.snagMinion(mid)
                 minion.activize()
-                $scope.$emit "Marshall", mid)
+                $scope.$emit "Marshall", mid
+              , (error) ->
+                    $scope.errorMsg = "Failed to ping #{item}"
+                )
           , (error) ->
-                $scope.errorMsg "There was an error with fetching actives"
+                $scope.errorMsg = "There was an error with fetching actives"
                 console.log error
 
         $scope.fetchGrains = (target) ->
