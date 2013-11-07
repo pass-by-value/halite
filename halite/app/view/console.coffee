@@ -412,7 +412,8 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
           .then (data) ->
             _.each data,  (item)->
               $scope.fetchPings(item, $q)
-              .then($scope.fetchGrains)
+              .then((mid) ->
+                $scope.$emit "Marshall", mid)
           , (error) ->
                 $scope.errorMsg "There was an error with fetching actives"
                 console.log error
@@ -698,14 +699,13 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
         $scope.activateListener = (event) ->
             #console.log "Received #{event.name}"
             #console.log event
-            #$scope.fetchActives()
-            $scope.fetchDocs()
-
-        $scope.marshallListener = (event) ->
-            #console.log "Received #{event.name}"
-            #console.log event
             $scope.fetchActives()
             $scope.fetchDocs()
+
+        $scope.marshallListener = (event, mid) ->
+#            console.log "Received #{event.name}"
+#            console.log event
+            $scope.fetchGrains(mid)
 
         $scope.$on('ToggleAuth', $scope.authListener)
         $scope.$on('Activate', $scope.activateListener)
