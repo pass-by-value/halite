@@ -373,11 +373,12 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
                 return defer.reject "Run call did not get any results"
           return defer.promise
 
-        $scope.deactivateMinions = (mids) ->
+        $scope.pruneMinions = (mids) ->
           toDeactivate = _.difference($scope.minions.keys(), mids)
           for mid in toDeactivate
             minion = $scope.snagMinion(mid)
             minion.deactivize()
+            $scope.minions.del(mid)
           return mids
 
         $scope.getWheelTag = ($q, $rootScope) ->
@@ -408,11 +409,13 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
         $scope.fetchActives = () ->
           $scope.getWheelTag($q, $rootScope)
           .then($scope.getMinionListFromWheeler)
-          .then($scope.deactivateMinions)
+          .then($scope.pruneMinions)
           .then (data) ->
             _.each data,  (item)->
               $scope.fetchPings(item, $q)
               .then((mid) ->
+                minion = $scope.snagMinion(mid)
+                minion.activize()
                 $scope.$emit "Marshall", mid)
           , (error) ->
                 $scope.errorMsg "There was an error with fetching actives"
