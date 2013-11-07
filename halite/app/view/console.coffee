@@ -494,11 +494,14 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
         $scope.fetchDocsFailed = () ->
             $scope.errorMsg = 'Failed to fetch Docs. Please check system and retry'
 
-        $scope.fetchDocs = () ->
+        $scope.fetchDocs = (target) ->
+            if not target
+              target = '*'
+
             command =
                 fun: 'sys.doc'
                 mode: 'async'
-                tgt: '*'
+                tgt: target
                 expr_form: 'glob'
 
             # command = $scope.snagCommand($scope.humanize(commands), commands)
@@ -710,9 +713,9 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
 #            console.log event
             if mid?
               $scope.fetchGrains(mid)
+              $scope.fetchDocs(mid)
             else
               $scope.fetchActives()
-              $scope.fetchDocs()
 
         $scope.$on('ToggleAuth', $scope.authListener)
         $scope.$on('Activate', $scope.activateListener)
