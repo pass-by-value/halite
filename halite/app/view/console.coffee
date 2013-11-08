@@ -1,12 +1,12 @@
 $rootScope = null
 mainApp = angular.module("MainApp") #get reference to MainApp module
 
-mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route', '$q', '$filter',
+mainApp.controller 'ConsoleCtlr', ['$scope', '$timeout', '$rootScope', '$location', '$route', '$q', '$filter',
     '$templateCache',
     'Configuration','AppData', 'AppPref', 'Item', 'Itemizer', 
     'Minioner', 'Resulter', 'Jobber', 'Runner', 'Wheeler', 'Commander', 'Pagerage',
     'SaltApiSrvc', 'SaltApiEvtSrvc', 'SessionStore', '$filter',
-    ($scope, $rootScope, $location, $route, $q, $filter, $templateCache, Configuration,
+    ($scope, $timeout, $rootScope, $location, $route, $q, $filter, $templateCache, Configuration,
     AppData, AppPref, Item, Itemizer, Minioner, Resulter, Jobber, Runner, Wheeler, 
     Commander, Pagerage, SaltApiSrvc, SaltApiEvtSrvc, SessionStore ) ->
         $scope.location = $location
@@ -362,15 +362,21 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
               result = data.return?[0]
               if result
                 job = $scope.startJob(result, cmd)
+                watchdogTimer = $timeout () ->
+                  defer.reject "Timed out"
+                , 6000
                 job.commit($q)
                 .then (donejob) ->
                     for {key: mid, val: result} in donejob.results.items()
                       if not result.fail and result.active
+                        $timeout.cancel watchdogTimer
                         return defer.resolve mid
                       else
                         return defer.reject "Job failed or minion inactive"
               else
                 return defer.reject "Run call did not get any results"
+          .error (data, status, header, config) ->
+              return defer.reject "Failed to connect to backend service"
           return defer.promise
 
         $scope.pruneMinions = (mids) ->
@@ -378,7 +384,7 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
           for mid in toDeactivate
             minion = $scope.snagMinion(mid)
             minion.unlinkJobs()
-          $scope.minions?.filter toDeactivate
+          $scope.minions?.filter mids
           return mids
 
         $scope.getWheelTag = ($q, $rootScope) ->
@@ -398,11 +404,16 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
             mode: "async"
             fun: "wheel.key.list_all"
           wheel = $scope.startWheel(tag, cmd)
+          watchdogTimer = $timeout () ->
+              $scope.errorMsg = "Salt List All Call Timed out! Please fetch minion status again."
+              throw {"err": "Timed out"}
+            , 6000
           wheel.commit($q)
           .then (donejob) ->
               ret = []
               for {key: _key, val: result} in donejob.results.items()
                 unless result.fail
+                  $timeout.cancel(watchdogTimer)
                   ret = ret.concat result.return.minions
               return ret # list of minion_ids
 
@@ -421,8 +432,7 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$rootScope', '$location', '$route'
                     $scope.errorMsg = "Failed to ping #{item}"
                 )
           , (error) ->
-                $scope.errorMsg = "There was an error with fetching actives"
-                console.log error
+                $scope.errorMsg = "There was an error trying to fetch actives"
 
         $scope.fetchGrains = (target) ->
             #target = if target then target else "*"
