@@ -530,7 +530,6 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$timeout', '$rootScope', '$locatio
                 return false
             return true
 
-
         $scope.startWheel = (tag, cmd) ->
 #            console.log "Start Wheel #{$scope.humanize(cmd)}"
 #            console.log tag
@@ -742,7 +741,6 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$timeout', '$rootScope', '$locatio
 
         $scope.testFocus = (name) ->
             console.log "focus #{name}"
-
 
         return true
     ]
