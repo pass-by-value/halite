@@ -493,19 +493,11 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
               fun: 'sys.argspec'
               tgt: '*'
 
-          SaltApiSrvc.runHTTPWithCallbacks($scope, command, (data, status, headers, config) ->
-            result = data.return?[0] #result is a tag
-            if result
-
-              job = $scope.startJob(result, command) #runner result is a tag
-              job.resolveOnAnyPass = true
-              job.commit($q).then (doneJob) ->
-                console.log "sys.argspec is done"
-                console.log doneJob
-                return true
-              return true
-          , (data, status, headers, config) ->
-            return false)
+          SaltApiSrvc.runWithJobber($scope, command, (doneJob) ->
+            console.log "sys.argspec is done"
+            console.log doneJob
+            return true
+          , $q)
           return true
 
         $scope.fetchDocs = () ->

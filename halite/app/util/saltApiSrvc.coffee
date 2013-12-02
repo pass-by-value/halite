@@ -22,10 +22,10 @@ mainApp.controller 'MyCtlr', ['$scope', ...,'SaltApiSrvc',
 ###
 
 
-saltApiSrvc = angular.module("saltApiSrvc", ['appConfigSrvc', 'appPrefSrvc', 'appStoreSrvc'])
+saltApiSrvc = angular.module("saltApiSrvc", ['appConfigSrvc', 'appPrefSrvc', 'appStoreSrvc', 'appUtilSrvc'])
 
-saltApiSrvc.factory "SaltApiSrvc", ['$http', 'Configuration', 'AppPref', 'SessionStore',
-    ($http, Configuration, AppPref, SessionStore) ->
+saltApiSrvc.factory "SaltApiSrvc", ['$http', 'Configuration', 'AppPref', 'SessionStore', 'Jobber',
+    ($http, Configuration, AppPref, SessionStore, Jobber) ->
         saltApi = AppPref.get('saltApi')
         if saltApi.scheme or saltApi.host or saltApi.port # absolute
             if not saltApi.scheme
@@ -78,6 +78,17 @@ saltApiSrvc.factory "SaltApiSrvc", ['$http', 'Configuration', 'AppPref', 'Sessio
               util.error(errorCallback) if errorCallback?
 
             runWithAutoErrorHandle: ($scope, cmds, successCallback) ->
+              _runWithAutoErrorHandle($scope, cmds, successCallback)
+
+            runWithJobber: ($scope, cmds, doneCallback, $q) ->
+              successCallback = (data, status, headers, config) ->
+                result = data.return?[0] #result is a tag
+                if result
+                  job = $scope.startJob(result, cmds) #runner result is a tag
+                  job.commit($q).then (doneJob) ->
+                    doneCallback(doneJob)
+                    return true
+                return true
               _runWithAutoErrorHandle($scope, cmds, successCallback)
 
             action: ($scope, cmds) ->
