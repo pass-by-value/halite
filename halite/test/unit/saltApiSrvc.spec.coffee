@@ -41,6 +41,27 @@ describe "Salt API Service Unit Tests", () ->
     $httpBackend.flush()
     expect(i).toBe(2)
 
+  it "runWithAutoErrorHandle calls success callback on success", () ->
+    $httpBackend.whenPOST('/run').respond({success: true})
+    successCallback = jasmine.createSpy("Success Callback Spy")
+    SaltApiSrvc.runWithAutoErrorHandle($scope, 'foo', successCallback)
+    $httpBackend.flush()
+    expect(successCallback).toHaveBeenCalled()
+
+  it "runWithAutoErrorHandle does not call success callback on error", () ->
+    $httpBackend.whenPOST('/run').respond(500, {error: 'fail'})
+    successCallback = jasmine.createSpy("Success Callback Spy")
+    SaltApiSrvc.runWithAutoErrorHandle($scope, 'foo', successCallback)
+    $httpBackend.flush()
+    expect(successCallback).not.toHaveBeenCalled()
+
+  it "runWithAutoErrorHandle sets errorMsg on error", () ->
+    $httpBackend.whenPOST('/run').respond(500, {error: 'fail'})
+    successCallback = jasmine.createSpy("Success Callback Spy")
+    SaltApiSrvc.runWithAutoErrorHandle($scope, 'foo', successCallback)
+    $httpBackend.flush()
+    expect($scope.errorMsg).toBe('Run Failed! fail')
+
   it "runHTTPWithCallbacks calls success callback", () ->
     $httpBackend.whenPOST('/run').respond({success: true})
     successCallback = jasmine.createSpy("Success Callback Spy")

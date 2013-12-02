@@ -43,7 +43,7 @@ saltApiSrvc.factory "SaltApiSrvc", ['$http', 'Configuration', 'AppPref', 'Sessio
         delete $http.defaults.headers.common['X-Requested-With']
         $http.defaults.useXDomain = true # enable cors on IE
 
-        run = ($scope, cmds) ->
+        _run = ($scope, cmds) ->
           headers =
             "X-Auth-Token": SessionStore.get('saltApiAuth')?.token
 
@@ -66,11 +66,14 @@ saltApiSrvc.factory "SaltApiSrvc", ['$http', 'Configuration', 'AppPref', 'Sessio
 
         servicer =
             run: ($scope, cmds) ->
-              run($scope, cmds)
+              _run($scope, cmds)
             runHTTPWithCallbacks: ($scope, cmds, successCallback, errorCallback) ->
-              run($scope, cmds)
+              util = _run($scope, cmds)
+              util.success(successCallback)
+              util.error(errorCallback) if errorCallback?
+            runWithAutoErrorHandle: ($scope, cmds, successCallback) ->
+              _run($scope, cmds)
               .success(successCallback)
-              .error(errorCallback)
             action: ($scope, cmds) ->
                 headers =
                     "X-Auth-Token": SessionStore.get('saltApiAuth')?.token
