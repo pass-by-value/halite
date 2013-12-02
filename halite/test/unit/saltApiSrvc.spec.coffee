@@ -41,6 +41,38 @@ describe "Salt API Service Unit Tests", () ->
     $httpBackend.flush()
     expect(i).toBe(2)
 
+  it "runHTTPWithCallbacks calls success callback", () ->
+    $httpBackend.whenPOST('/run').respond({success: true})
+    successCallback = jasmine.createSpy("Success Callback Spy")
+    errorCallback = jasmine.createSpy("Error Callback Spy")
+    SaltApiSrvc.runHTTPWithCallbacks($scope, 'foo', successCallback, errorCallback)
+    $httpBackend.flush()
+    expect(successCallback).toHaveBeenCalled()
+
+  it "runHTTPWithCallbacks does not call error callback on success", () ->
+    $httpBackend.whenPOST('/run').respond({success: true})
+    successCallback = jasmine.createSpy("Success Callback Spy")
+    errorCallback = jasmine.createSpy("Error Callback Spy")
+    SaltApiSrvc.runHTTPWithCallbacks($scope, 'foo', successCallback, errorCallback)
+    $httpBackend.flush()
+    expect(errorCallback).not.toHaveBeenCalled()
+
+  it "runHTTPWithCallbacks calls error callback", () ->
+    $httpBackend.whenPOST('/run').respond(500, {error: 'fail'})
+    errorCallback = jasmine.createSpy("Error Callback Spy")
+    successCallback = jasmine.createSpy("Success Callback Spy")
+    SaltApiSrvc.runHTTPWithCallbacks($scope, 'foo', successCallback, errorCallback)
+    $httpBackend.flush()
+    expect(errorCallback).toHaveBeenCalled()
+
+  it "runHTTPWithCallbacks does not call success callback on error", () ->
+    $httpBackend.whenPOST('/run').respond(500, {error: 'fail'})
+    errorCallback = jasmine.createSpy("Error Callback Spy")
+    successCallback = jasmine.createSpy("Success Callback Spy")
+    SaltApiSrvc.runHTTPWithCallbacks($scope, 'foo', successCallback, errorCallback)
+    $httpBackend.flush()
+    expect(successCallback).not.toHaveBeenCalled()
+
   it "sets the proper error message on run method error", () ->
     $httpBackend.whenPOST('/run').respond(500, {error: 'fail'})
     SaltApiSrvc.run($scope, 'foo')

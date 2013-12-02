@@ -50,7 +50,7 @@ saltApiSrvc.factory "SaltApiSrvc", ['$http', 'Configuration', 'AppPref', 'Sessio
           config =
             headers: headers
           url = "#{base}/run"
-          $http.post( url, cmds, config  )
+          $http.post(url, cmds, config)
           .success((data, status, headers, config) ->
               #console.log SessionStore.get('saltApiAuth')?.token
               return true
@@ -67,6 +67,10 @@ saltApiSrvc.factory "SaltApiSrvc", ['$http', 'Configuration', 'AppPref', 'Sessio
         servicer =
             run: ($scope, cmds) ->
               run($scope, cmds)
+            runHTTPWithCallbacks: ($scope, cmds, successCallback, errorCallback) ->
+              run($scope, cmds)
+              .success(successCallback)
+              .error(errorCallback)
             action: ($scope, cmds) ->
                 headers =
                     "X-Auth-Token": SessionStore.get('saltApiAuth')?.token
