@@ -494,10 +494,10 @@ mainApp.controller 'ConsoleCtlr', ['$scope', '$location', '$route', '$q', '$filt
               tgt: '*'
 
           SaltApiSrvc.runWithJobber($scope, command, (doneJob) ->
-            console.log "sys.argspec is done"
-            console.log doneJob
+            $scope.argSpecs = _.find(doneJob.results.items(), (item) ->
+              return item.val.results().length > 0)?.val.results()[0]
             return true
-          , $q)
+          , $q, true)
           return true
 
         $scope.fetchDocs = () ->

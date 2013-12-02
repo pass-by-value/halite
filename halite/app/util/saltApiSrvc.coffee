@@ -80,11 +80,12 @@ saltApiSrvc.factory "SaltApiSrvc", ['$http', 'Configuration', 'AppPref', 'Sessio
             runWithAutoErrorHandle: ($scope, cmds, successCallback) ->
               _runWithAutoErrorHandle($scope, cmds, successCallback)
 
-            runWithJobber: ($scope, cmds, doneCallback, $q) ->
+            runWithJobber: ($scope, cmds, doneCallback, $q, resolveOnAnyPass = false) ->
               successCallback = (data, status, headers, config) ->
                 result = data.return?[0] #result is a tag
                 if result
                   job = $scope.startJob(result, cmds) #runner result is a tag
+                  job.resolveOnAnyPass = resolveOnAnyPass
                   job.commit($q).then (doneJob) ->
                     doneCallback(doneJob)
                     return true
