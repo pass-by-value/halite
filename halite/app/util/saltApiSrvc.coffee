@@ -64,16 +64,22 @@ saltApiSrvc.factory "SaltApiSrvc", ['$http', 'Configuration', 'AppPref', 'Sessio
               return true
             )
 
+        _runWithAutoErrorHandle = ($scope, cmds, successCallback) ->
+          _run($scope, cmds)
+          .success(successCallback)
+
         servicer =
             run: ($scope, cmds) ->
               _run($scope, cmds)
+
             runHTTPWithCallbacks: ($scope, cmds, successCallback, errorCallback) ->
               util = _run($scope, cmds)
               util.success(successCallback)
               util.error(errorCallback) if errorCallback?
+
             runWithAutoErrorHandle: ($scope, cmds, successCallback) ->
-              _run($scope, cmds)
-              .success(successCallback)
+              _runWithAutoErrorHandle($scope, cmds, successCallback)
+
             action: ($scope, cmds) ->
                 headers =
                     "X-Auth-Token": SessionStore.get('saltApiAuth')?.token
