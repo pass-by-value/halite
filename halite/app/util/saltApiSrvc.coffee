@@ -43,27 +43,30 @@ saltApiSrvc.factory "SaltApiSrvc", ['$http', 'Configuration', 'AppPref', 'Sessio
         delete $http.defaults.headers.common['X-Requested-With']
         $http.defaults.useXDomain = true # enable cors on IE
 
+        run = ($scope, cmds) ->
+          headers =
+            "X-Auth-Token": SessionStore.get('saltApiAuth')?.token
+
+          config =
+            headers: headers
+          url = "#{base}/run"
+          $http.post( url, cmds, config  )
+          .success((data, status, headers, config) ->
+              #console.log SessionStore.get('saltApiAuth')?.token
+              return true
+            )
+          .error((data, status, headers, config) ->
+              error = data?.error
+              if status == 401
+                $scope.errorMsg = "Please Login! #{error}"
+              else
+                $scope.errorMsg = "Run Failed! #{error}"
+              return true
+            )
+
         servicer =
             run: ($scope, cmds) ->
-                headers =
-                    "X-Auth-Token": SessionStore.get('saltApiAuth')?.token
-
-                config =
-                    headers: headers
-                url = "#{base}/run"
-                $http.post( url, cmds, config  )
-                .success((data, status, headers, config) ->
-                    #console.log SessionStore.get('saltApiAuth')?.token
-                    return true
-                )
-                .error((data, status, headers, config) ->
-                    error = data?.error
-                    if status == 401
-                        $scope.errorMsg = "Please Login! #{error}"
-                    else
-                        $scope.errorMsg = "Run Failed! #{error}"
-                    return true
-                )
+              run($scope, cmds)
             action: ($scope, cmds) ->
                 headers =
                     "X-Auth-Token": SessionStore.get('saltApiAuth')?.token
