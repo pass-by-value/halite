@@ -502,6 +502,10 @@
             <span class="larger-font-size">Apache</span>
           </span>&nbsp;<span ng-if="minion.apache.success">Uptime: {{minion.apache.uptime}}</span>
           <span ng-if="minion.apache.fail">Status: {{minion.apache.error[0] | truncate:40}}</span>
+          <span class="monitorControls">
+            <i ng-click="submitApacheStatusCheck(minion.id)" class="pull-right fa-icon-refresh">
+            </i>
+          </span>
           <!-- <p>Not implemented yet adi {{minion.apache}}</p> -->
 <!--           <form ng-submit="submitApacheStatusCheck(minion.id)">
             <input type="submit">
