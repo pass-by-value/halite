@@ -52,6 +52,7 @@ def loadWebUI(app, devel=False, coffee=False):
     @app.route('/app') # /app
     @app.route('/') # /
     def appGet(path=''):
+        # return bottle.static_file(path, root='/Users/adi/salt-datamodel/dist')
         if devel:
             return(  createStaticMain(    kind='bottle',
                                             base=args.base,
@@ -266,7 +267,7 @@ def loadSaltApi(app, opts=None):
         bottle.response.set_header('Cache-Control',  'no-cache')
 
         # Set client-side auto-reconnect timeout, ms.
-        yield 'retry: 250\n\n'
+        yield 'retry: 1500\n\n'
 
         while True:
             data =  client.get_event(wait=0.025, tag=tag, full=True)
