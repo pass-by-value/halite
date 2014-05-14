@@ -46,6 +46,21 @@ MOLD_DIR_PATH = os.path.join(HALITE_DIR_PATH, 'mold')
 def loadWebUI(app, devel=False, coffee=False):
     ''' Load endpoints for bottle app'''
 
+
+    @app.route('/websocket')
+    def handle_websocket():
+        wsock = bottle.request.environ.get('wsgi.websocket')
+        if not wsock:
+            bottle.abort(400, 'Expected WebSocket request.')
+
+        while True:
+            try:
+                message = wsock.receive()
+                wsock.send("Your message was: %r" % message)
+            except WebSocketError:
+                break
+
+
     #catch all for page refreshes of any app url
     @app.route('/app/<path:path>') # /app/<path>
     @app.route('/app/') # /app/
@@ -224,6 +239,7 @@ def loadSaltApi(app, opts=None):
         Execute salt command with either credentials in post data
         or token from url or token from X-Auth-Token headertoken
         '''
+        logger.error("In the run method ******************")
         if not token:
             token = bottle.request.get_header('X-Auth-Token')
 
@@ -521,6 +537,7 @@ def startServer(level='info',
     import bottle
 
     app = bottle.default_app() # create bottle app
+    # app = bottle.Bottle()
 
     loadErrors(app)
     loadWebUI(app, devel=devel, coffee=coffee)
@@ -538,16 +555,22 @@ def startServer(level='info',
     logger.info("TLS/SSL is {0}.".format('enabled' if tls else 'disabled'))
     logger.info("Server options: \n{0}".format(options))
 
-    bottle.run( app=app,
-                server=server,
-                host=host,
-                port=port,
-                debug=devel,
-                reloader=devel and not gevented,
-                interval=1,
-                quiet=False,
-                **options)
 
+    from gevent.pywsgi import WSGIServer
+    from geventwebsocket import WebSocketError
+    from geventwebsocket.server import WebSocketHandler
+
+    my_server = WSGIServer(('0.0.0.0', 8080), app, handler_class=WebSocketHandler)
+    # bottle.run( app=app,
+    #             server=my_server,
+    #             host=host,
+    #             port=port,
+    #             debug=devel,
+    #             reloader=devel and not gevented,
+    #             interval=1,
+    #             quiet=False,
+    #             **options)
+    my_server.serve_forever()
 
 def parseArgs():
     '''
