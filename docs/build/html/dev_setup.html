@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installing Halite for Development &mdash; Halite (Prototype) 0.1.17 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.17',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Halite (Prototype) 0.1.17 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to Halite (Prototype)’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Halite (Prototype)’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Halite (Prototype) 0.1.17 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installing-halite-for-development">
+<h1>Installing Halite for Development<a class="headerlink" href="#installing-halite-for-development" title="Permalink to this headline">¶</a></h1>
+<p>This document describes the steps necessary to install Halite for development.</p>
+<p>Programming languages used are</p>
+<ul class="simple">
+<li>Python (2.7)</li>
+<li>Coffeescript (1.8)</li>
+<li>CSS</li>
+<li>HTML</li>
+</ul>
+<div class="section" id="install-salt">
+<h2>Install Salt<a class="headerlink" href="#install-salt" title="Permalink to this headline">¶</a></h2>
+<p>Please make sure that you have already installed salt master on your dev box. Halite requires the salt master to be running on the same machine.
+Once you install salt please add your user to the <tt class="docutils literal"><span class="pre">external_auth</span></tt> section. Please use this (non root) user for logging in to Halite.</p>
+</div>
+<div class="section" id="install-halite-deps">
+<h2>Install Halite Deps<a class="headerlink" href="#install-halite-deps" title="Permalink to this headline">¶</a></h2>
+<p>Please install <tt class="docutils literal"><span class="pre">nodejs</span></tt> (v0.10+) and <tt class="docutils literal"><span class="pre">npm</span></tt>. Once you install npm please install coffee-script by doing <tt class="docutils literal"><span class="pre">npm</span> <span class="pre">install</span> <span class="pre">-g</span> <span class="pre">coffee-script</span></tt>. Lastly install the <tt class="docutils literal"><span class="pre">paste</span></tt> server by running <tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">paste</span></tt>.</p>
+</div>
+<div class="section" id="install-halite">
+<h2>Install Halite<a class="headerlink" href="#install-halite" title="Permalink to this headline">¶</a></h2>
+<p>Once you have the deps installed as stated above, you can clone the code and install it as shown below. Note: Please change the IP address below to your IP address.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>git clone git@github.com/Saltstack/halite.git
+<span class="nv">$ </span>pip install -e ./halite
+<span class="nv">$ </span><span class="nb">cd </span>halite
+<span class="nv">$ </span>./prep_dist.py  <span class="c"># Compiles coffee-script to Javascript</span>
+<span class="nv">$ </span>./halite/server_bottle.py -a 192.168.33.11 -p 8001 <span class="c"># starts halite</span>
+</pre></div>
+</div>
+<p>You can now navigate to <a class="reference external" href="http://192.168.33.11:8001/app">http://192.168.33.11:8001/app</a> to access Halite. More <a class="reference external" href="https://github.com/saltstack/halite/blob/e476b79583506e34c26cdd260eed0c24b9f15c5f/halite/server_bottle.py#L577-L634">options</a> can be passed in to <tt class="docutils literal"><span class="pre">server_bottle.py</span></tt>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installing Halite for Development</a><ul>
+<li><a class="reference internal" href="#install-salt">Install Salt</a></li>
+<li><a class="reference internal" href="#install-halite-deps">Install Halite Deps</a></li>
+<li><a class="reference internal" href="#install-halite">Install Halite</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Halite (Prototype)&#8217;s documentation!</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/dev_setup.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Halite (Prototype)’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">Halite (Prototype) 0.1.17 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, https://github.com/saltstack/halite/graphs/contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

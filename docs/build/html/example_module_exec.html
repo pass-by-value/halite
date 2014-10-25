@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Halite Job Execution &mdash; Halite (Prototype) 0.1.17 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.17',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Halite (Prototype) 0.1.17 documentation" href="index.html" />
+    <link rel="prev" title="Installing Halite for Development" href="dev_setup.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="dev_setup.html" title="Installing Halite for Development"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Halite (Prototype) 0.1.17 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="halite-job-execution">
+<h1>Halite Job Execution<a class="headerlink" href="#halite-job-execution" title="Permalink to this headline">¶</a></h1>
+<p>This document describes how Halite’s front end code executes Salt jobs.</p>
+<p>The main parts of Halite and which are responsible for enabling job execution are</p>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/saltstack/salt/blob/50d51e76e08dae125cdcb5554bb0968daed09308/salt/client/api.py#L43">APIClient</a> - A Python class (salt.utils.APIClient) to programmatically interface with Salt</li>
+<li><a class="reference external" href="https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py">Server side end points</a> exposed by server_bottle.py</li>
+<li><a class="reference external" href="https://github.com/saltstack/halite/tree/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/lattice">Front end</a> AngularJS app provided through Lattice</li>
+</ul>
+<div class="section" id="id1">
+<h2>APIClient<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>One of the (Python) classes responsible for providing a programmatic interface to Salt. Halite’s server side code interfaces with Salt using <tt class="docutils literal"><span class="pre">APIClient</span></tt>. Functionality provided by the APIClient includes authentication, running salt execution modules and listening for events on the salt master’s event bus. The purpose of such an interface is to enable command and control of your infrastructure using a GUI / client or a third party interface. Halite serves as a prototype GUI to explore these ideas.</p>
+</div>
+<div class="section" id="end-points">
+<h2>End Points<a class="headerlink" href="#end-points" title="Permalink to this headline">¶</a></h2>
+<p>These end points are exposed over HTTP and provide the following methods / urls among others</p>
+<ul class="simple">
+<li>[ /login](<a class="reference external" href="https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py#L162">https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py#L162</a>) for sending the credentials and getting a token</li>
+<li>[/run](<a class="reference external" href="https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py#L221">https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py#L221</a>) for running a salt command by passing in low data and and authentication token</li>
+<li>[/event](<a class="reference external" href="https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py#L250">https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py#L250</a>) provides an event stream that lets us listen to Salt’s event bus</li>
+</ul>
+</div>
+<div class="section" id="front-end-app">
+<h2>Front end app<a class="headerlink" href="#front-end-app" title="Permalink to this headline">¶</a></h2>
+<p>Following steps are performed by Halite when it loads</p>
+<ul class="simple">
+<li>[Open the event stream](<a class="reference external" href="https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/lattice/app/view/base.coffee#L356">https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/lattice/app/view/base.coffee#L356</a>) and establish a connection to Salt</li>
+<li>When the event stream is opened Halite makes a [call to the runner manage.present](<a class="reference external" href="https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/lattice/app/view/base.coffee#L91">https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/lattice/app/view/base.coffee#L91</a>) and queries for connected minions.</li>
+<li>Once connected minions are known grains are fetched for these</li>
+<li>System documentation (sys.doc) is fetched</li>
+<li>Other optional information (jobs in the cache) is fetched and high state status checks are queued.</li>
+</ul>
+<p>Once the above process is complete, the following information is present on the client side</p>
+<ul class="simple">
+<li>Minions</li>
+<li>Jobs</li>
+<li>Commands</li>
+<li>Events (that occurred since we opened the event stream)</li>
+<li>Docs</li>
+</ul>
+<p>The above information is maintained on the client side, all of it (except docs) is tracked and updated in real time by Halite. This tracking is performed by listening to events and updating the above variables / data structures as events happen. We’ll cover more about event processing in a subsequent tutorial.</p>
+<p>Let’s go back to our original objective of trying to execute salt commands asynchronously and being able to get our hands on the result and look at an example. In this example we’ll be going through Highstate checker’s code. The highstate checker executes state.highstate test=True by passing in low data to salt. The high state call is asynchronously executed. We’ll also be discussing any event callbacks that are required to process event results asynchronously.</p>
+<p>The code that we are interested in is [highstateCheckSrvc.coffee’s makeHighStateCall function](<a class="reference external" href="https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/lattice/app/util/highstateCheckSrvc.coffee#L58-L86">https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/lattice/app/util/highstateCheckSrvc.coffee#L58-L86</a>).</p>
+<ul class="simple">
+<li>On line number 61 we obtain a list of connected minions.</li>
+<li>Lines 63-68 are responsible for building the low data that we’ll need to pass to salt for executing the function state.highstate test=True, on the given target.</li>
+<li>Line 70 causes the actual HTTP call to be made to the /run end point. At this point if everything is ok Salt responds with a JID. The functions beginning on lines 71 and 81 deal with the success and error callbacks for the HTTP call.</li>
+<li>In the success callback for the HTTP return we have a JID that was generated in response to this high state job (the job is not yet complete). On line number 74 we update the system state and add an entry for this job to the list of jobs Halite maintains. On line number 75 we see a call to the <tt class="docutils literal"><span class="pre">then</span></tt> method where functions are attached to be called when the highstate test=True job eventually finishes (a return event for this JID is seen on the event bus). We pass a success and an error function so that both the possible cases are handled.</li>
+</ul>
+<p>So the following sequence of events is typical when executing jobs through Halite.</p>
+<ul class="simple">
+<li>Make a call to the /run end point with the low data</li>
+<li>Salt responds with a JID for this job</li>
+<li>Attach a second level of callbacks (based on the returned JID) that are triggered in response to a return (/ret) event for this JID. The <tt class="docutils literal"><span class="pre">ret</span></tt> event can be seen on the event bus.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Halite Job Execution</a><ul>
+<li><a class="reference internal" href="#id1">APIClient</a></li>
+<li><a class="reference internal" href="#end-points">End Points</a></li>
+<li><a class="reference internal" href="#front-end-app">Front end app</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="dev_setup.html"
+                        title="previous chapter">Installing Halite for Development</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/example_module_exec.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="dev_setup.html" title="Installing Halite for Development"
+             >previous</a> |</li>
+        <li><a href="index.html">Halite (Prototype) 0.1.17 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, https://github.com/saltstack/halite/graphs/contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

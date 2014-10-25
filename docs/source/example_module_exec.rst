@@ -5,9 +5,12 @@ This document describes how Halite’s front end code executes Salt jobs.
 
 The main parts of Halite and which are responsible for enabling job execution are
 
-* [APIClient](https://github.com/saltstack/salt/blob/50d51e76e08dae125cdcb5554bb0968daed09308/salt/client/api.py#L43) - A Python class (salt.utils.APIClient) to programmatically interface with Salt
-* [Server side end points](https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py>) exposed by server_bottle.py
-* [Front end](https://github.com/saltstack/halite/tree/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/lattice) AngularJS app provided through Lattice
+* `APIClient
+  <https://github.com/saltstack/salt/blob/50d51e76e08dae125cdcb5554bb0968daed09308/salt/client/api.py#L43>`_ - A Python class (salt.utils.APIClient) to programmatically interface with Salt
+* `Server side end points
+  <https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py>`_ exposed by server_bottle.py
+* `Front end
+  <https://github.com/saltstack/halite/tree/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/lattice>`_ AngularJS app provided through Lattice
 
 APIClient
 ---------
@@ -20,7 +23,7 @@ End Points
 These end points are exposed over HTTP and provide the following methods / urls among others
 
 
-* [/login](https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py#L162) for sending the credentials and getting a token
+* [ /login](https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py#L162) for sending the credentials and getting a token
 * [/run](https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py#L221) for running a salt command by passing in low data and and authentication token
 * [/event](https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py#L250) provides an event stream that lets us listen to Salt’s event bus
 
