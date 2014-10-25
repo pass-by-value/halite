@@ -27,7 +27,9 @@ These end points are exposed over HTTP and provide the following methods / urls 
 * `/run
   <https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py#L221>`_ for running a salt command by passing in low data and and authentication token
 * `/event
-  <https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py#L250>`_ provides an event stream that lets us listen to Salt’s event bus
+  <https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/server_bottle.py#L250>`_ provides a connection to Salt’s event bus. This end point is analogous to `eventlisten.py
+  <https://github.com/saltstack/salt/blob/2b60e66c086ec8948dc8f31d4d7220392b06d5b3/tests/eventlisten.py>`_ over http (and in the browser). Data is pushed to connected client applications per the `Server Sent Events
+  <https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events>`_ spec
 
 Front end app
 -------------
