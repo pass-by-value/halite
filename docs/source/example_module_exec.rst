@@ -40,7 +40,7 @@ Following steps are performed by Halite when it loads
 
 * `Open the event stream
   <https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/lattice/app/view/base.coffee#L356>`_ (establish a connection to Salt)
-* When the event stream is opened Halite makes a `call to the runner ~manage.present~ manage.up
+* When the event stream is opened Halite makes a `call to the runner manage.up
   <https://github.com/saltstack/halite/blob/754a45ed3b5e44d7b951004dd2fc0d3d4d651f17/halite/lattice/app/view/base.coffee#L91>`_ and queries for connected minions
 * Grains are fetched for connected minions
 * System documentation (sys.doc) is fetched
