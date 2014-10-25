@@ -14,7 +14,7 @@ Programming languages used are
 Install Salt
 ------------
 
-Please make sure that you have already installed salt master on your dev box. Halite requires the salt master to be running on the same machine.
+Please install salt master on your dev box. Halite requires salt master to be running on the same machine.
 Once you install salt please add your user to the ``external_auth`` section. Please use this (non root) user for logging in to Halite.
 
 Install Halite Deps
